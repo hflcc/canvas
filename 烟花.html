@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+      html, body {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background: #000000;
+      }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('myCanvas')
+    const context = canvas.getContext('2d')
+
+    canvas.width = document.body.clientWidth
+    canvas.height = document.body.clientHeight
+
+    canvas.addEventListener('click', function (e) {
+      play(e.clientX, e.clientY)
+    })
+
+    function clearCanvas() {
+      context.clearRect(0, 0, canvas.width, canvas.height)
+    }
+
+
+    function createFireWorks(x, y, particles) {
+      const hue = Math.floor(Math.random()*51) + 150;
+      const hueVariance = 30;
+      const count = 100;
+
+      for (let i = 0; i < count; i++) {
+        const p = {}
+        const angle = Math.floor(Math.random() * 360);
+        p.radians = angle * Math.PI / 180
+        p.sx = x
+        p.sy = y
+        p.speed = (Math.random() * 5) + 0.4
+        p.size = Math.floor(Math.random() * 3) + 1
+        p.radius = p.speed
+
+        p.hue = Math.floor(Math.random()*((hue+hueVariance)-(hue-hueVariance)))+(hue-hueVariance);
+        p.brightness = Math.floor(Math.random()*31)+50;
+        p.alpha = (Math.floor(Math.random()*61)+40)/100;
+
+        particles.push(p);
+      }
+    }
+
+
+    function drawFireWorks(particles) {
+      for (let i = 0, len = particles.length; i < len; i++) {
+        const p = particles[i]
+        let vx = Math.cos(p.radians) * p.radius;
+        let vy = Math.sin(p.radians) * p.radius + 0.4;
+        p.sx += vx;
+        p.sy += vy;
+        p.radius *= 1 - p.speed / 100;
+        p.alpha -= 0.005;
+
+        context.beginPath();
+        context.arc(p.sx, p.sy, p.size, 0, Math.PI * 2, false);
+        context.closePath();
+
+        context.fillStyle = 'hsla('+p.hue+', 100%, '+p.brightness+'%, '+ p.alpha +')';
+        context.fill()
+      }
+    }
+
+
+    function play(x, y) {
+      let particles = []
+      clearCanvas()
+      createFireWorks(x, y, particles)
+      function tick() {
+        context.globalCompositeOperation = "destination-out";
+        context.fillStyle = "rgba(0, 0, 0, 0.1)";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.globalCompositeOperation = "lighter";
+        drawFireWorks(particles)
+        window.requestAnimationFrame(tick)
+      }
+      window.requestAnimationFrame(tick)
+      window.cancelAnimationFrame(tick)
+    }
+  </script>
+</body>
+</html>
