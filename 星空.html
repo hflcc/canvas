@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    html,body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #000000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('myCanvas')
+    const context = canvas.getContext('2d')
+
+    canvas.width = document.body.clientWidth
+    canvas.height = document.body.clientHeight
+
+
+    function clearCanvas() {
+      context.clearRect(0, 0, canvas.width, canvas.height)
+    }
+
+    function createStar(data = []) {
+      const count = 100
+      const radius = 1
+
+      for (let i = 0, len = count; i < len; i++) {
+        const p = {}
+        p.angle = 0
+        p.x = Math.random() * canvas.width
+        p.y = Math.random() * canvas.height
+        p.radius = radius + Math.random()
+        data.push(p)
+      }
+    }
+
+    function drawStar(data = []) {
+      for (let i = 0, len = data.length; i < len; i++) {
+        const p = data[i]
+        // if (p.angle >= 360) {
+        //   p.angle = 0
+        // } else {
+        //   p.angle += 0.1
+        // }
+        // const dis = Math.sqrt(Math.pow(Math.abs(p.x), 2) + Math.pow(p.y, 2))
+        // const radians = Math.PI * p.angle / 180
+        // const x = p.x + Math.cos(radians) * dis
+        // const y = p.y + Math.sin(radians) * dis
+        const x = p.x
+        const y = p.y
+        context.beginPath()
+        context.arc(x, y, p.radius, 0, Math.PI * 2, false)
+        context.shadowColor = '#ffffff'
+        context.shadowBlur = Math.random()
+        context.fillStyle = `rgba(255, 255, 255, ${Math.random()})`
+        context.fill()
+      }
+    }
+
+    function play() {
+      let starArr = []
+      let start = 0
+      createStar(starArr)
+      function tick(timestamp) {
+        if (start === 0) {
+          start = timestamp
+          clearCanvas()
+          drawStar(starArr)
+        } else if (timestamp - start > 800){
+          start = timestamp
+          clearCanvas()
+          drawStar(starArr)
+        }
+        // clearCanvas()
+        // drawStar(starArr)
+        window.requestAnimationFrame(tick)
+      }
+      window.requestAnimationFrame(tick)
+      window.cancelAnimationFrame(tick)
+    }
+
+    play()
+  </script>
+</body>
+</html>
